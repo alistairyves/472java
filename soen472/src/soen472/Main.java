@@ -2,8 +2,12 @@ package soen472;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.String;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.TreeMap;
 
@@ -12,8 +16,13 @@ public class Main {
 	static String hamPath = System.getProperty("user.dir")+"\\emails\\20030228_easy_ham_2\\easy_ham_2";
 	static String spamPath = System.getProperty("user.dir")+"\\emails\\20030228_spam_2\\spam_2";
 	
-	static TreeMap<String, Integer> HamMap = new TreeMap<String, Integer>();
-	static TreeMap<String, Integer> SpamMap = new TreeMap<String, Integer>();
+	static Map<String, Integer> HamMap = new TreeMap<String, Integer>();
+	static Map<String, Integer> SpamMap = new TreeMap<String, Integer>();
+	
+	static Map<String, int[]> CombinedMap = new TreeMap<String, int[]>();
+	
+	static int hamTotal = 0;
+	static int spamTotal = 0;
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -59,8 +68,51 @@ public class Main {
 	    }
 	    System.out.println(count);
 
-	    System.out.println(HamMap);
-	    System.out.println(SpamMap);
+	    //System.out.println(HamMap);
+	    //System.out.println(SpamMap);
+	    
+	    for(Entry<String, Integer> entry : HamMap.entrySet()){
+	    	int[] tmparr = new int[2];
+	    	tmparr[0] = entry.getValue();
+	    	if(SpamMap.containsKey(entry.getKey()))
+	    		tmparr[1] = SpamMap.get(entry.getKey());
+	    	else
+	    		tmparr[1] = 0;
+	    	CombinedMap.put(entry.getKey(), tmparr);
+	    	hamTotal += tmparr[0];
+	    	spamTotal += tmparr[1];
+	    	
+	    }
+	    
+	    for(Entry<String, Integer> entry : SpamMap.entrySet()){
+	    	if(!CombinedMap.containsKey(entry.getKey()))
+	    	{
+	    		int[] tmparr = new int[2];
+	    		tmparr[0] = 0;
+	    		tmparr[1] = entry.getValue();
+	    		CombinedMap.put(entry.getKey(), tmparr);
+	    		spamTotal += tmparr[1];
+	    	}
+	    	
+	    }
+	    System.out.println(CombinedMap);
+	    int tmp1 = 0;
+	    count = 0;
+	    try {
+			PrintWriter writer = new PrintWriter("dictionary.txt", "UTF-8");
+			for(Entry<String, int[]> entry : CombinedMap.entrySet()){
+		    	writer.println((count++)+"   " +entry.getKey() + "  " + (tmp1 = entry.getValue()[0]) + "  " + ((float)tmp1/hamTotal)
+		    			+"  "+(tmp1 = entry.getValue()[1]) + "  " + ((float)tmp1/spamTotal));
+		    }
+			writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    
 	    
 	    
 	}
@@ -105,7 +157,7 @@ public class Main {
 		
 	}
 	
-	private static void addEntry(TreeMap<String, Integer> map, String strEntry)
+	private static void addEntry(Map<String, Integer> map, String strEntry)
 	{
 		if(map.containsKey(strEntry))
 		{
