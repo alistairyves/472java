@@ -101,8 +101,10 @@ public class Main {
 	    try {
 			PrintWriter writer = new PrintWriter("dictionary.txt", "UTF-8");
 			for(Entry<String, int[]> entry : CombinedMap.entrySet()){
-		    	writer.println((count++)+"   " +entry.getKey() + "  " + (tmp1 = entry.getValue()[0]) + "  " + ((float)tmp1/hamTotal)
-		    			+"  "+(tmp1 = entry.getValue()[1]) + "  " + ((float)tmp1/spamTotal));
+		    	writer.println((count++)+"   " +entry.getKey() + "  " + (tmp1 = entry.getValue()[0]) + "  " 
+		    			+ (tmp1==0 ? 0.5/hamTotal : ((float)tmp1/hamTotal))
+		    			+"  "+(tmp1 = entry.getValue()[1]) + "  " 
+		    			+ (tmp1==0 ? 0.5/spamTotal : (float)tmp1/spamTotal));
 		    }
 			writer.close();
 		} catch (FileNotFoundException e) {
@@ -168,7 +170,7 @@ public class Main {
 	}
 	static boolean wordCheck(String str){
 		//There are very few constraints at the moment, but more can be added
-		if(str.length()<3 || numCheck(str))
+		if(str.length()<4 || numCheck(str) || str.length()>15)
 			return true;
 		return false;
 	}
