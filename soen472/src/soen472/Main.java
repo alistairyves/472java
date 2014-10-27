@@ -37,6 +37,8 @@ public class Main {
 	    File[] spamFiles = spamDir.listFiles();
 	    
 	    int count = 0;
+	    
+	    System.out.println("Processing Ham Files");
 	    for (File file : hamFiles) {
 	        if (file.isDirectory()) {
 	            System.out.print("directory:");
@@ -52,25 +54,17 @@ public class Main {
 	        //tempf = file;
 	    }	 
 	    count = 0;
+	    System.out.println("Processing Spam Files");
 	    for (File file : spamFiles) {
-	        if (file.isDirectory()) {
-	            System.out.print("directory:");
-	        } else {
-	            //System.out.print("file: \t");
-	        }
 	        processSpamFile(file);
-	        //System.out.println(file.getAbsolutePath());
 	        count++;
 	        if (count >= 1000){
 	        	break;
 	        }
 	        //tempf = file;
 	    }
-	    System.out.println(count);
-
-	    //System.out.println(HamMap);
-	    //System.out.println(SpamMap);
 	    
+	    System.out.println("Combining Dictionaries");
 	    for(Entry<String, Integer> entry : HamMap.entrySet()){
 	    	int[] tmparr = new int[2];
 	    	tmparr[0] = entry.getValue();
@@ -95,11 +89,12 @@ public class Main {
 	    	}
 	    	
 	    }
-	    System.out.println(CombinedMap);
+	    
+	    System.out.println("Printing Model");
 	    int tmp1 = 0;
 	    count = 0;
 	    try {
-			PrintWriter writer = new PrintWriter("dictionary.txt", "UTF-8");
+			PrintWriter writer = new PrintWriter("model.txt", "UTF-8");
 			for(Entry<String, int[]> entry : CombinedMap.entrySet()){
 		    	writer.println((count++)+"   " +entry.getKey() + "  " + (tmp1 = entry.getValue()[0]) + "  " 
 		    			+ (tmp1==0 ? 0.5/hamTotal : ((float)tmp1/hamTotal))
@@ -114,6 +109,8 @@ public class Main {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	    
+	    System.out.println("File processing complete, \nprinted to \"model.txt\"");
 	    
 	    
 	    
