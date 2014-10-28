@@ -1,3 +1,6 @@
+We certify that this submission is the original work of members of the group and meets the
+Faculty's Expectations of Originality
+
 KHARAZI, Sayana. id# 6283136
 MERSEREAU, Alistair. id# 9021957
 =======

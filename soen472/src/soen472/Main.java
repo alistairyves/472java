@@ -26,9 +26,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		System.out.println(System.getProperty("user.dir"));
-		System.out.println(hamPath);
-		System.out.println(spamPath);
+		System.out.println("Begining program");
 
 		File hamDir = new File(hamPath);
 		File spamDir = new File(spamPath);
