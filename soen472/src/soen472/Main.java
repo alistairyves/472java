@@ -95,9 +95,11 @@ public class Main {
 			PrintWriter writer = new PrintWriter("model.txt", "UTF-8");
 			for(Entry<String, int[]> entry : CombinedMap.entrySet()){
 		    	writer.println((count++)+"   " +entry.getKey() + "  " + (tmp1 = entry.getValue()[0]) + "  " 
-		    			+ (tmp1==0 ? 0.5/hamTotal : ((float)tmp1/hamTotal))
+		    			//+ (tmp1==0 ? 0.5/hamTotal : ((float)tmp1/hamTotal))//old bad smoothing
+		    			+ tmp1+0.5/(hamTotal+(CombinedMap.size()*0.5))
 		    			+"  "+(tmp1 = entry.getValue()[1]) + "  " 
-		    			+ (tmp1==0 ? 0.5/spamTotal : (float)tmp1/spamTotal));
+		    			//+ (tmp1==0 ? 0.5/spamTotal : (float)tmp1/spamTotal));//old bad smoothing
+		    			+ tmp1+0.5/(spamTotal+(CombinedMap.size()*0.5)));
 		    }
 			writer.close();
 		} catch (FileNotFoundException e) {
