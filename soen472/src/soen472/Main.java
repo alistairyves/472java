@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.String;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
@@ -38,6 +40,7 @@ public class Main {
 	    
 	    System.out.println("Processing Ham Files");
 	    for (File file : hamFiles) {
+	    	
 	        if (file.isDirectory()) {
 	            System.out.print("directory:");
 	        } else {
@@ -92,16 +95,16 @@ public class Main {
 	    int tmp1 = 0;
 	    count = 0;
 	    try {
-			PrintWriter writer = new PrintWriter("model.txt", "UTF-8");
+			PrintWriter writer1 = new PrintWriter("model.txt", "UTF-8");
 			for(Entry<String, int[]> entry : CombinedMap.entrySet()){
-		    	writer.println((count++)+"   " +entry.getKey() + "  " + (tmp1 = entry.getValue()[0]) + "  " 
+		    	writer1.println((count++)+"   " +entry.getKey() + "  " + (tmp1 = entry.getValue()[0]) + "  " 
 		    			//+ (tmp1==0 ? 0.5/hamTotal : ((float)tmp1/hamTotal))//old bad smoothing
-		    			+ tmp1+0.5/(hamTotal+(CombinedMap.size()*0.5))
+		    			+ (tmp1+0.5)/(hamTotal+(CombinedMap.size()*0.5))
 		    			+"  "+(tmp1 = entry.getValue()[1]) + "  " 
 		    			//+ (tmp1==0 ? 0.5/spamTotal : (float)tmp1/spamTotal));//old bad smoothing
-		    			+ tmp1+0.5/(spamTotal+(CombinedMap.size()*0.5)));
+		    			+ (tmp1+0.5)/(spamTotal+(CombinedMap.size()*0.5)));
 		    }
-			writer.close();
+			writer1.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -111,6 +114,127 @@ public class Main {
 		}
 	    
 	    System.out.println("File processing complete, \nprinted to \"model.txt\"");
+	    
+	    
+	    System.out.println("Beginning Naive Bayes Processing");
+	    
+	    //For this exercise the folder paths are the same as for creating the model
+	    String testHamPath = System.getProperty("user.dir")+"\\testemails\\ham";
+	    String testSpamPath = System.getProperty("user.dir")+"\\testemails\\spam";
+	    
+	    
+	    
+	    int testCount = 1;
+	    float hamScore;
+	    float SpamScore;
+	    String result;
+	    boolean correct;
+	    int correctSum = 0;
+	    try {
+			PrintWriter writer2 = new PrintWriter("results.txt", "UTF-8");
+			PrintWriter writer3 = new PrintWriter("analysis.txt", "UTF-8");
+			
+			File testHamDir = new File(testHamPath);
+		    File testSpamDir = new File(testSpamPath);
+		    
+		    File[] testHamFiles = testHamDir.listFiles();
+		    File[] testSpamFiles = testSpamDir.listFiles();
+		    
+		    //first test the ham
+		    System.out.println("Processing test Ham Files");
+		    
+		    for(File file : testHamFiles){
+		    	hamScore = 0;
+		    	SpamScore = 0;
+		    	result = "";
+		    	List<String> words = tokenizeFile(file);
+		    	for(String word : words){
+		    		if(CombinedMap.containsKey(word)){
+		    			hamScore += 
+		    					Math.log10((CombinedMap.get(word)[0]+0.5)/(hamTotal+(CombinedMap.size()*0.5)));
+		    			SpamScore += 
+		    					Math.log10((CombinedMap.get(word)[1]+0.5)/(hamTotal+(CombinedMap.size()*0.5)));
+		    		}
+		    	}
+		    	if(hamScore >= SpamScore)
+		    		result = "ham";
+		    	else
+		    		result = "spam";
+		    	
+		    	if(result.equals("ham"))
+		    	{
+		    		correct = true;
+		    		correctSum++;
+		    	}
+		    	else
+		    		correct = false;
+		    		
+		    	
+		    	writer2.println(testCount + "   " + file.getName() + "   "+
+		    			result + "   " + hamScore + "   " + SpamScore);
+		    	writer3.println(testCount + "   " + file.getName() + "   " + result
+		    			+ "   " + "ham" + "   " + (correct ? "correct" : "incorrect"));
+		    	testCount+=1;
+		    }
+		    
+		    System.out.println("Processing test Spam Files");
+		    for(File file : testSpamFiles){
+		    	hamScore = 0;
+		    	SpamScore = 0;
+		    	result = "";
+		    	List<String> words = tokenizeFile(file);
+		    	for(String word : words){
+		    		if(CombinedMap.containsKey(word)){
+		    			hamScore += 
+		    					Math.log10((CombinedMap.get(word)[0]+0.5)/(hamTotal+(CombinedMap.size()*0.5)));
+		    			SpamScore += 
+		    					Math.log10((CombinedMap.get(word)[1]+0.5)/(hamTotal+(CombinedMap.size()*0.5)));
+		    		}
+		    	}
+		    	if(hamScore >= SpamScore)
+		    		result = "ham";
+		    	else
+		    		result = "spam";
+		    	if(result.equals("spam"))
+		    	{
+		    		correct = true;
+		    		correctSum++;
+		    	}
+		    	else
+		    		correct = false;
+		    		
+		    	
+		    	writer2.println(testCount + "   " + file.getName() + "   "+
+		    			result + "   " + hamScore + "   " + SpamScore);
+		    	writer3.println(testCount + "   " + file.getName() + "   " + result
+		    			+ "   " + "ham" + "   " + (correct ? "correct" : "incorrect"));
+		    	testCount+=1;
+		    }
+		    
+		    writer3.println("//////////////////////////////////////////////////");
+		    writer3.println("////////////////////ANALYSIS//////////////////////");
+		    writer3.println("//////////////////////////////////////////////////");
+		    writer3.println("Number of Correct Classifications: " + correctSum);
+		    writer3.println("Accuracy: " + (float)correctSum/(testCount-1));
+		    writer3.println("Confusion Matrix");
+		    writer2.close();
+		    writer3.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    
+	    
+	    
+	    
+	    //now test the spam
+	    
+	    
+	    
+	    
 	    
 	    
 	    
@@ -180,5 +304,25 @@ public class Main {
 		
 		return false;
 	}
-
+	
+	private static List<String> tokenizeFile(File file){
+		List<String> tokenWords = new ArrayList<String>();
+		try {
+			Scanner scanner = new Scanner(file);
+			while(scanner.hasNextLine()){
+				String line = scanner.nextLine();
+				String words[] = line.split("\\W*(\\W|_)\\W*");//splits on non alpha-numeric characters and ___
+				for(int i =0; i<words.length; i++){
+					if(wordCheck(words[i]))
+						continue;
+					tokenWords.add(words[i].toLowerCase());
+				}
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	
+		return tokenWords;
+	}
 }
