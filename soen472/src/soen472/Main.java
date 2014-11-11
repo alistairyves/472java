@@ -129,7 +129,8 @@ public class Main {
 	    float SpamScore;
 	    String result;
 	    boolean correct;
-	    int correctSum = 0;
+	    int correctHamSum = 0;
+	    int correctSpamSum = 0;
 	    try {
 			PrintWriter writer2 = new PrintWriter("results.txt", "UTF-8");
 			PrintWriter writer3 = new PrintWriter("analysis.txt", "UTF-8");
@@ -164,7 +165,7 @@ public class Main {
 		    	if(result.equals("ham"))
 		    	{
 		    		correct = true;
-		    		correctSum++;
+		    		correctHamSum++;
 		    	}
 		    	else
 		    		correct = false;
@@ -198,7 +199,7 @@ public class Main {
 		    	if(result.equals("spam"))
 		    	{
 		    		correct = true;
-		    		correctSum++;
+		    		correctSpamSum++;
 		    	}
 		    	else
 		    		correct = false;
@@ -214,9 +215,16 @@ public class Main {
 		    writer3.println("//////////////////////////////////////////////////");
 		    writer3.println("////////////////////ANALYSIS//////////////////////");
 		    writer3.println("//////////////////////////////////////////////////");
-		    writer3.println("Number of Correct Classifications: " + correctSum);
-		    writer3.println("Accuracy: " + (float)correctSum/(testCount-1));
+		    writer3.println("Number of Correct Classifications: " + correctHamSum+correctSpamSum);
+		    writer3.println("Accuracy: " + (float)(correctHamSum+correctSpamSum)/(testCount-1));
+		    writer3.println("//////////////////////////////////////////////////");
+		    writer3.println("//////////////////////////////////////////////////");
 		    writer3.println("Confusion Matrix");
+		    writer3.println("\t\tham\t\t\tspam");
+		    writer3.println("ham\t\t"+(float)(correctHamSum)/400
+		    		+("\t\t") + (float)(400-correctHamSum)/400);
+		    writer3.println("spam\t"+ (float)(400-correctSpamSum)/400 
+		    		+"\t\t"+(float)(correctSpamSum)/400);
 		    writer2.close();
 		    writer3.close();
 		} catch (FileNotFoundException e) {
@@ -227,7 +235,7 @@ public class Main {
 			e.printStackTrace();
 		}
 	    
-	    
+	    System.out.println("printing complete");
 	    
 	    
 	    //now test the spam
